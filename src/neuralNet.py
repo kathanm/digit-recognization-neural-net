@@ -31,6 +31,12 @@ class NeuralNet:
                     weights[(layers[i][j], layers[i+1][k])] = 1
         self.weights = weights
 
+    def readInput(self, input):
+        if len(input) != self.input_size:
+            raise Exception("Malformed input - does not match expected length")
+        for i in xrange(self.input_size):
+            self.layers[0][i].value = input[i]
+
     def feedforward(self):
         for i in xrange(self.num_layers + 1):
             prev_layer = self.layers[i]
@@ -42,3 +48,6 @@ class NeuralNet:
 
 
 n = NeuralNet(1,1,1,1)
+n.readInput([0.4])
+n.feedforward()
+print n.layers[2][0].value
