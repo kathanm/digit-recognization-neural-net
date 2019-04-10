@@ -46,6 +46,15 @@ class NeuralNet:
                     sum += self.weights[(prev_neuron, neuron)] * prev_neuron.value
                 neuron.value = util.sigmoid(sum)
 
+    def calculateLoss(self, expectedDigit):
+        sumOfSquares = 0
+        for i in xrange(self.output_size):
+            if i != expectedDigit:
+                sumOfSquares += (0 - self.layers[self.layer_size + 1][i].value)**2
+            else:
+                sumOfSquares += (1 - self.layers[self.layer_size + 1][i].value ** 2)
+        return sumOfSquares
+
 
 n = NeuralNet(1,1,1,1)
 n.readInput([0.4])
