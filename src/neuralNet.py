@@ -55,8 +55,13 @@ class NeuralNet:
                 sumOfSquares += (1 - self.layers[self.layer_size + 1][i].value ** 2)
         return sumOfSquares
 
+    def propogateBack(self, expectedDigit):
+        for index, layer in reversed(list(enumerate(self.layers))):
+            print(index)
+
+
 
 n = NeuralNet(1,1,1,1)
 n.readInput([0.4])
 n.feedforward()
-print n.layers[2][0].value
+n.propogateBack()
