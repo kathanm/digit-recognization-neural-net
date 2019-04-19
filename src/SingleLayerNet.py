@@ -22,6 +22,7 @@ class SingleLayerNet:
                 weights[(n1, n2)] = 1
         self.weights = weights
 
+    # Input is a list of numbers
     def readInput(self, input):
         if len(input) != len(self.inputLayer):
             raise Exception()
@@ -41,16 +42,28 @@ class SingleLayerNet:
                 sum += self.weights[(nh, n)] * nh.value
             n.value = util.sigmoid(sum)
 
+    # expectedOutput is a list of expected output values corresponding to each output neuron
     def backProp(self, expectedOutput):
         if len(expectedOutput) != len(self.outputLayer):
             raise Exception()
         result = zip(self.outputLayer, expectedOutput)
 
-        for n1 in self.hiddenLayer:
-            for i2, n2 in enumerate(self.outputLayer):
-                z = n1.value * self.weights[(n1, n2)] + n2.bias
-                gradient = n1.value * util.sigmoid_derivative(z) * 2 * (n2.value - expectedOutput[i2])
-                self.weights[(n1, n2)] -= self.learningRate * gradient
+        for n in self.inputLayer:
+            for i1, n1 in enumerate(self.hiddenLayer):
+                derivativeOfCostByActivation = 0
+                for i2, n2 in enumerate(self.outputLayer):
+                    z = n1.value * self.weights[(n1, n2)] + n2.bias
+                    derivativeByZ = util.sigmoid_derivative(z) * (n2.value - expectedOutput[i2])
+                    gradient = n1.value * derivativeByZ
+                    derivativeOfCostByActivation += self.weights[(n1, n2)] * derivativeByZ
+                    n2.bias -= self.learningRate * derivativeByZ
+                    self.weights[(n1, n2)] -= self.learningRate * gradient
+                z = n.value * self.weights[(n, n1)] + n1.bias
+                derivativeByZ = util.sigmoid_derivative(z) * derivativeOfCostByActivation
+                gradient = n.value * derivativeByZ
+                n1.bias -= self.learningRate * derivativeByZ
+                self.weights[(n, n1)] -= self.learningRate * gradient
+
 
 
 sln = SingleLayerNet(3, 3, 3)
