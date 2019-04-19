@@ -2,6 +2,7 @@ import util
 
 class Neuron:
     def __init__(self, bias):
+        self.value = None
         self.bias = bias
 
 class SingleLayerNet:
@@ -19,7 +20,12 @@ class SingleLayerNet:
             for n2 in self.outputLayer:
                 weights[(n1, n2)] = 1
         self.weights = weights
-        
+
+    def readInput(self, input):
+        if len(input) != len(self.inputLayer):
+            raise Exception()
+        for i in xrange(len(self.inputLayer)):
+            self.inputLayer[i].value = input[i]
 
 sln = SingleLayerNet(3, 3, 3)
 print sln.inputLayer
