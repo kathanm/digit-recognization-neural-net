@@ -27,5 +27,18 @@ class SingleLayerNet:
         for i in xrange(len(self.inputLayer)):
             self.inputLayer[i].value = input[i]
 
+    def feedForward(self):
+        for n in self.hiddenLayer:
+            sum = n.bias
+            for ni in self.inputLayer:
+                sum +=  self.weights[(ni, n)] * ni.value
+            n.value = util.sigmoid(sum)
+
+        for n in self.outputLayer:
+            sum = n.bias
+            for nh in self.hiddenLayer:
+                sum += self.weights[(nh, n)] * nh.value
+            n.value = util.sigmoid(sum)
+
 sln = SingleLayerNet(3, 3, 3)
 print sln.inputLayer
