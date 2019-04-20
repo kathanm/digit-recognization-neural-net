@@ -107,29 +107,33 @@ def main():
     with open('sln.pkl', 'wb') as output:
         pickle.dump(sln, output, pickle.HIGHEST_PROTOCOL)
 
-with open('sln.pkl', 'rb') as input:
-    sln = pickle.load(input)
-    with open('../resources/submission.csv', 'wb') as f:
-        writer = csv.writer(f)
-        writer.writerow(['ImageId', 'Label'])
-        with open('../resources/test.csv', 'rb') as testfile:
-            reader = csv.reader(testfile, delimiter=',')
-            count = 0
-            for row in reader:
-                if count == 0:
+def run_tests():
+    with open('sln.pkl', 'rb') as input:
+        sln = pickle.load(input)
+        with open('../resources/submission.csv', 'wb') as f:
+            writer = csv.writer(f)
+            writer.writerow(['ImageId', 'Label'])
+            with open('../resources/test.csv', 'rb') as testfile:
+                reader = csv.reader(testfile, delimiter=',')
+                count = 0
+                for row in reader:
+                    if count == 0:
+                        count += 1
+                        continue
+                    input = list(map(int, row))
+                    sln.readInput(input)
+                    sln.feedForward()
+                    max_num = 0
+                    max_val = sln.outputLayer[0].value
+                    for i, n in enumerate(sln.outputLayer):
+                        print str(count) + ": " + str(i) + ": " + str(n.value)
+                        if n.value > max_val:
+                            max_num = i
+                            max_val = n.value
+                    if count > 5:
+                        break
+                    writer.writerow([str(count), str(max_num)])
                     count += 1
-                    continue
-                input = list(map(int, row))
-                sln.readInput(input)
-                sln.feedForward()
-                max_num = 0
-                max_val = sln.outputLayer[0].value
-                for i, n in enumerate(sln.outputLayer):
-                    print str(count) + ": " + str(i) + ": " + str(n.value)
-                    if n.value > max_val:
-                        max_num = i
-                        max_val = n.value
-                if count > 5:
-                    break
-                writer.writerow([str(count), str(max_num)])
-                count += 1
+
+if __name__ == '__main__':
+    main()
