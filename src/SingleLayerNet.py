@@ -52,7 +52,7 @@ class SingleLayerNet:
         result = zip(self.outputLayer, expectedOutput)
 
         hiddenLayerActivationDerviative = []
-        for i1, n1 in enumerate(self.hiddenLayer):
+        for n1 in self.hiddenLayer:
             derivativeOfCostByActivation = 0
             for i2, n2 in enumerate(self.outputLayer):
                 z = n1.value * self.weights[(n1, n2)] + n2.bias
