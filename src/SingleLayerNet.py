@@ -76,8 +76,8 @@ def main():
     no_of_different_labels = 10
     image_pixels = image_size * image_size
     train_data = np.loadtxt(
-        'I:\\Programing\\College\\AI\\Projects\\digit-recognization-neural-net\\resources\\train.csv', None, '#', ',')
-    test_data = np.loadtxt('I:\\Programing\\College\\AI\\Projects\\digit-recognization-neural-net\\resources\\test.csv',
+        '..\\resources\\train.csv', None, '#', ',')
+    test_data = np.loadtxt('..\\resources\\test.csv',
                            None, '#', ',')
     fac = 0.99 / 255
     train_imgs = np.asfarray(train_data[:, 1:]) * fac + 0.01
