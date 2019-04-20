@@ -1,6 +1,7 @@
 import util
 import pickle
 import numpy as np
+import csv
 
 class Neuron:
     def __init__(self, bias):
@@ -71,6 +72,7 @@ class SingleLayerNet:
                 n1.bias -= self.learningRate * derivativeByZ
                 self.weights[(n, n1)] -= self.learningRate * gradient
 
+
 def main():
     image_size = 28
     no_of_different_labels = 10
@@ -105,5 +107,29 @@ def main():
     with open('sln.pkl', 'wb') as output:
         pickle.dump(sln, output, pickle.HIGHEST_PROTOCOL)
 
-if __name__ == '__main__':
-    main()
+with open('sln.pkl', 'rb') as input:
+    sln = pickle.load(input)
+    with open('submission.csv', 'wb') as f:
+        writer = csv.writer(f)
+        writer.writerow(['ImageId', 'Label'])
+        with open('../resources/test.csv', 'rb') as testfile:
+            reader = csv.reader(testfile, delimiter=',')
+            count = 0
+            for row in reader:
+                if count == 0:
+                    count += 1
+                    continue
+                input = list(map(int, row))
+                sln.readInput(input)
+                sln.feedForward()
+                max_num = 0
+                max_val = sln.outputLayer[0].value
+                for i, n in enumerate(sln.outputLayer):
+                    print str(count) + ": " + str(i) + ": " + str(n.value)
+                    if n.value > max_val:
+                        max_num = i
+                        max_val = n.value
+                if count > 5:
+                    break
+                writer.writerow([str(count), str(max_num)])
+                count += 1
