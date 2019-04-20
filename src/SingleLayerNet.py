@@ -10,7 +10,7 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.01):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.1):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -71,6 +71,22 @@ class SingleLayerNet:
                 n1.bias -= self.learningRate * derivativeByZ
                 self.weights[(n, n1)] -= self.learningRate * gradient
 
+    def getChosenValue(self):
+        maxIndex = 0
+        maxValue = self.outputLayer[0].value
+        for i, n in enumerate(self.outputLayer):
+            if n.value > maxValue:
+                maxIndex = i
+                maxValue = n.value
+        return maxIndex
+
+    def getLoss(self, expected):
+        sumOfSquares = 0
+        for i, n in enumerate(self.outputLayer):
+            sumOfSquares +=  (n.value - expected[i]) ** 2
+        return sumOfSquares / 2
+
+
 
 def main():
     image_size = 28
@@ -112,13 +128,21 @@ def train_net():
     with open('../resources/train.csv', 'rb') as trainingData:
         reader = csv.reader(trainingData)
         count = 0
+        batchLoss = 0
         for row in reader:
+            if count > 1000:
+                break
             input = list(map(int, row))
             expectedOutput = [0] * 10
             expectedOutput[input[0]] = 1
             input2 = input[1:]
             sln.readInput(input2)
             sln.feedForward()
+            print("Expected value: " + str(input[0]) + " ----------------- Received Value: " + str(sln.getChosenValue()))
+            batchLoss += sln.getLoss(expectedOutput)
+            if (count % 50 == 0):
+                print ("Batch loss " + str(int(count / 50)) + ": " + str(batchLoss))
+                batchLoss = 0
             sln.backProp(expectedOutput)
             print(count)
             count += 1
@@ -144,16 +168,13 @@ def run_tests():
                     input = list(map(int, row))
                     sln.readInput(input)
                     sln.feedForward()
-                    max_num = 0
+                    max_num = sln.getChosenValue()
                     max_val = sln.outputLayer[0].value
-                    for i, n in enumerate(sln.outputLayer):
-                        if n.value > max_val:
-                            max_num = i
-                            max_val = n.value
-                    if count > 5:
-                        break
                     writer.writerow([str(count), str(max_num)])
                     count += 1
+
+train_net()
+run_tests()
 
 if __name__ == '__main__':
     main()
