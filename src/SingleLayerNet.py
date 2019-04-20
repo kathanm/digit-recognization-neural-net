@@ -124,6 +124,9 @@ def train_net():
             print(count)
             count += 1
 
+    with open('sln.pkl', 'wb') as output:
+        pickle.dump(sln, output, pickle.HIGHEST_PROTOCOL)
+
 
 def run_tests():
     with open('sln.pkl', 'rb') as input:
