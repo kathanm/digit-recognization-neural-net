@@ -92,7 +92,7 @@ def main():
 
     sln = SingleLayerNet(image_pixels, 20, no_of_different_labels)
     count = 0
-    for i in range(100):
+    for i in range(len(train_imgs)):
         sln.readInput(train_imgs[i])
         sln.feedForward()
         sln.backProp(train_labels_one_hot[i])
