@@ -1,12 +1,12 @@
-import numpy as np
-
 import util
 import pickle
+import numpy as np
 
 class Neuron:
     def __init__(self, bias):
         self.value = None
         self.bias = bias
+
 
 class SingleLayerNet:
     def __init__(self, inputSize, layerSize, outputSize, learningRate=0.0001):
@@ -36,7 +36,7 @@ class SingleLayerNet:
         for n in self.hiddenLayer:
             sum = n.bias
             for ni in self.inputLayer:
-                sum +=  self.weights[(ni, n)] * ni.value
+                sum += self.weights[(ni, n)] * ni.value
             n.value = util.sigmoid(sum)
 
         for n in self.outputLayer:
@@ -70,8 +70,6 @@ class SingleLayerNet:
                 gradient = n.value * derivativeByZ
                 n1.bias -= self.learningRate * derivativeByZ
                 self.weights[(n, n1)] -= self.learningRate * gradient
-
-
 
 def main():
     image_size = 28
@@ -107,5 +105,5 @@ def main():
     with open('sln.pkl', 'wb') as output:
         pickle.dump(sln, output, pickle.HIGHEST_PROTOCOL)
 
-
-main()
+if __name__ == '__main__':
+    main()
