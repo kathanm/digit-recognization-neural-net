@@ -69,8 +69,8 @@ class SingleLayerNet:
 
 
 def main():
-    image_size = 28  # width and length
-    no_of_different_labels = 10  # i.e. 0, 1, 2, 3, ..., 9
+    image_size = 28
+    no_of_different_labels = 10
     image_pixels = image_size * image_size
     train_data = np.loadtxt(
         'I:\\Programing\\College\\AI\\Projects\\digit-recognization-neural-net\\resources\\train.csv', None, '#', ',')
@@ -84,10 +84,8 @@ def main():
     sln = SingleLayerNet(766, 20, 10)
 
     lr = np.arange(no_of_different_labels)
-    # transform labels into one hot representation
     train_labels_one_hot = (lr == train_labels).astype(np.float)
     test_labels_one_hot = (lr == test_labels).astype(np.float)
-    # we don't want zeroes and ones in the labels neither:
     train_labels_one_hot[train_labels_one_hot == 0] = 0.01
     train_labels_one_hot[train_labels_one_hot == 1] = 0.99
     test_labels_one_hot[test_labels_one_hot == 0] = 0.01
