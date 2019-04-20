@@ -10,7 +10,7 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.001):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.01):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -107,6 +107,24 @@ def main():
     with open('sln.pkl', 'wb') as output:
         pickle.dump(sln, output, pickle.HIGHEST_PROTOCOL)
 
+def train_net():
+    inputSize = 28 ** 2
+    sln = SingleLayerNet(inputSize, 20, 10)
+    with open('../resources/train.csv', 'rb') as trainingData:
+        reader = csv.reader(trainingData)
+        count = 0
+        for row in reader:
+            input = list(map(int, row))
+            expectedOutput = [0] * 10
+            expectedOutput[input[0]] = 1
+            input2 = input[1:]
+            sln.readInput(input2)
+            sln.feedForward()
+            sln.backProp(expectedOutput)
+            print(count)
+            count += 1
+
+
 def run_tests():
     with open('sln.pkl', 'rb') as input:
         sln = pickle.load(input)
@@ -117,6 +135,7 @@ def run_tests():
                 reader = csv.reader(testfile, delimiter=',')
                 count = 0
                 for row in reader:
+                    print("Test: " + str(count))
                     if count == 0:
                         count += 1
                         continue
@@ -135,5 +154,8 @@ def run_tests():
                     writer.writerow([str(count), str(max_num)])
                     count += 1
 
-if __name__ == '__main__':
-    main()
+train_net()
+run_tests()
+
+#if __name__ == '__main__':
+    #main()
