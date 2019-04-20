@@ -1,12 +1,15 @@
 import util
+import numpy as np
+
 
 class Neuron:
     def __init__(self, bias):
         self.value = None
         self.bias = bias
 
+
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.0001):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.1):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -33,7 +36,7 @@ class SingleLayerNet:
         for n in self.hiddenLayer:
             sum = n.bias
             for ni in self.inputLayer:
-                sum +=  self.weights[(ni, n)] * ni.value
+                sum += self.weights[(ni, n)] * ni.value
             n.value = util.sigmoid(sum)
 
         for n in self.outputLayer:
@@ -65,5 +68,37 @@ class SingleLayerNet:
                 self.weights[(n, n1)] -= self.learningRate * gradient
 
 
+def main():
+    image_size = 28  # width and length
+    no_of_different_labels = 10  # i.e. 0, 1, 2, 3, ..., 9
+    image_pixels = image_size * image_size
+    train_data = np.loadtxt(
+        'I:\\Programing\\College\\AI\\Projects\\digit-recognization-neural-net\\resources\\train.csv', None, '#', ',')
+    test_data = np.loadtxt('I:\\Programing\\College\\AI\\Projects\\digit-recognization-neural-net\\resources\\test.csv',
+                           None, '#', ',')
+    fac = 0.99 / 255
+    train_imgs = np.asfarray(train_data[:, 1:]) * fac + 0.01
+    test_imgs = np.asfarray(test_data[:, 1:]) * fac + 0.01
+    train_labels = np.asfarray(train_data[:, :1])
+    test_labels = np.asfarray(test_data[:, :1])
+    sln = SingleLayerNet(766, 20, 10)
 
-sln = SingleLayerNet(3, 3, 3)
+    lr = np.arange(no_of_different_labels)
+    # transform labels into one hot representation
+    train_labels_one_hot = (lr == train_labels).astype(np.float)
+    test_labels_one_hot = (lr == test_labels).astype(np.float)
+    # we don't want zeroes and ones in the labels neither:
+    train_labels_one_hot[train_labels_one_hot == 0] = 0.01
+    train_labels_one_hot[train_labels_one_hot == 1] = 0.99
+    test_labels_one_hot[test_labels_one_hot == 0] = 0.01
+    test_labels_one_hot[test_labels_one_hot == 1] = 0.99
+
+    sln=SingleLayerNet(image_pixels,100,no_of_different_labels)
+    for i in range(len(train_imgs)):
+        sln.readInput(train_imgs[i])
+        sln.feedForward()
+        sln.backProp(train_labels_one_hot[i])
+
+
+if __name__ == '__main__':
+    main()
