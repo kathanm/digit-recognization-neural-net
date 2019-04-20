@@ -10,7 +10,7 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.0001):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.001):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -109,7 +109,7 @@ def main():
 
 with open('sln.pkl', 'rb') as input:
     sln = pickle.load(input)
-    with open('submission.csv', 'wb') as f:
+    with open('../resources/submission.csv', 'wb') as f:
         writer = csv.writer(f)
         writer.writerow(['ImageId', 'Label'])
         with open('../resources/test.csv', 'rb') as testfile:
