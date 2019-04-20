@@ -10,7 +10,7 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.1):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=25):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -139,9 +139,12 @@ def train_net():
             sln.readInput(input2)
             sln.feedForward()
             print("Expected value: " + str(input[0]) + " ----------------- Received Value: " + str(sln.getChosenValue()))
+            batchLosses = []
             batchLoss += sln.getLoss(expectedOutput)
             if (count % 50 == 0):
+                batchLosses.append(batchLoss)
                 print ("Batch loss " + str(int(count / 50)) + ": " + str(batchLoss))
+                print("Batch losses " + str(batchLosses))
                 batchLoss = 0
             sln.backProp(expectedOutput)
             print(count)
