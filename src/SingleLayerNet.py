@@ -9,7 +9,7 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.1):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=0.0001):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -81,7 +81,6 @@ def main():
     test_imgs = np.asfarray(test_data[:, 1:]) * fac + 0.01
     train_labels = np.asfarray(train_data[:, :1])
     test_labels = np.asfarray(test_data[:, :1])
-    sln = SingleLayerNet(766, 20, 10)
 
     lr = np.arange(no_of_different_labels)
     train_labels_one_hot = (lr == train_labels).astype(np.float)
@@ -91,11 +90,14 @@ def main():
     test_labels_one_hot[test_labels_one_hot == 0] = 0.01
     test_labels_one_hot[test_labels_one_hot == 1] = 0.99
 
-    sln=SingleLayerNet(image_pixels,100,no_of_different_labels)
-    for i in range(len(train_imgs)):
+    sln = SingleLayerNet(image_pixels, 20, no_of_different_labels)
+    count = 0
+    for i in range(100):
         sln.readInput(train_imgs[i])
         sln.feedForward()
         sln.backProp(train_labels_one_hot[i])
+        print count
+        count = count + 1
 
 
 if __name__ == '__main__':
