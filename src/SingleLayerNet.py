@@ -19,11 +19,11 @@ class SingleLayerNet:
         weights = {}
         for n1 in self.inputLayer:
             for n2 in self.hiddenLayer:
-                weights[(n1, n2)] = 1
+                weights[(n1, n2)] = .0001
 
         for n1 in self.hiddenLayer:
             for n2 in self.outputLayer:
-                weights[(n1, n2)] = 1
+                weights[(n1, n2)] = .01
         self.weights = weights
 
     # Input is a list of numbers
@@ -39,7 +39,6 @@ class SingleLayerNet:
             for ni in self.inputLayer:
                 sum += self.weights[(ni, n)] * ni.value
             n.value = util.sigmoid(sum)
-
         for n in self.outputLayer:
             sum = n.bias
             for nh in self.hiddenLayer:
@@ -148,7 +147,6 @@ def run_tests():
                     max_num = 0
                     max_val = sln.outputLayer[0].value
                     for i, n in enumerate(sln.outputLayer):
-                        print str(count) + ": " + str(i) + ": " + str(n.value)
                         if n.value > max_val:
                             max_num = i
                             max_val = n.value
@@ -157,8 +155,6 @@ def run_tests():
                     writer.writerow([str(count), str(max_num)])
                     count += 1
 
-train_net()
-run_tests()
-
-#if __name__ == '__main__':
-    #main()
+if __name__ == '__main__':
+    main()
+    run_tests()
