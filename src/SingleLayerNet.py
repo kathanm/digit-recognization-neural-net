@@ -129,6 +129,7 @@ def train_net():
         reader = csv.reader(trainingData)
         count = 0
         batchLoss = 0
+        batchLosses = []
         for row in reader:
             if count > 1000:
                 break
@@ -139,7 +140,6 @@ def train_net():
             sln.readInput(input2)
             sln.feedForward()
             print("Expected value: " + str(input[0]) + " ----------------- Received Value: " + str(sln.getChosenValue()))
-            batchLosses = []
             batchLoss += sln.getLoss(expectedOutput)
             if (count % 50 == 0):
                 batchLosses.append(batchLoss)
