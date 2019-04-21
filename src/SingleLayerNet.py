@@ -10,20 +10,20 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=10):
-        self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
-        self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
-        self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=3):
+        self.inputLayer = [Neuron(np.random.rand()) for i in xrange(inputSize)]
+        self.hiddenLayer = [Neuron(np.random.rand()) for i in xrange(layerSize)]
+        self.outputLayer = [Neuron(np.random.rand()) for i in xrange(outputSize)]
         self.learningRate = learningRate
 
         weights = {}
         for n1 in self.inputLayer:
             for n2 in self.hiddenLayer:
-                weights[(n1, n2)] = .0001
+                weights[(n1, n2)] = np.random.rand()
 
         for n1 in self.hiddenLayer:
             for n2 in self.outputLayer:
-                weights[(n1, n2)] = .01
+                weights[(n1, n2)] = np.random.rand()
         self.weights = weights
 
     # Input is a list of numbers
@@ -148,6 +148,7 @@ def train_net():
                 print("Batch losses " + str(batchLosses))
                 print("Learning rate: " + str(sln.learningRate))
                 batchLoss = 0
+                """
                 last_5_batches = batchLosses[-3:]
                 last_5_avg = sum(last_5_batches) / 3 if len(last_5_batches) == 3 else 100
                 if last_5_avg < 35:
@@ -160,6 +161,7 @@ def train_net():
                     sln.learningRate = 0.001 if sln.learningRate > .001 else sln.learningRate
                 if last_5_avg < 22:
                     sln.learningRate = 0.0001 if sln.learningRate > .0001 else sln.learningRate
+                    """
             sln.backProp(expectedOutput)
             print(count)
             count += 1
@@ -190,6 +192,7 @@ def run_tests():
                     max_val = sln.outputLayer[0].value
                     writer.writerow([str(count), str(max_num)])
                     count += 1
+
 
 train_net()
 run_tests()
