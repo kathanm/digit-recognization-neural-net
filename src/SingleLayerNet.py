@@ -10,7 +10,7 @@ class Neuron:
 
 
 class SingleLayerNet:
-    def __init__(self, inputSize, layerSize, outputSize, learningRate=25):
+    def __init__(self, inputSize, layerSize, outputSize, learningRate=10):
         self.inputLayer = [Neuron(0) for i in xrange(inputSize)]
         self.hiddenLayer = [Neuron(0) for i in xrange(layerSize)]
         self.outputLayer = [Neuron(0) for i in xrange(outputSize)]
@@ -128,11 +128,10 @@ def train_net():
     with open('../resources/train.csv', 'rb') as trainingData:
         reader = csv.reader(trainingData)
         count = 0
+        numberCorrect = 0
         batchLoss = 0
         batchLosses = []
         for row in reader:
-            if count > 1000:
-                break
             input = list(map(int, row))
             expectedOutput = [0] * 10
             expectedOutput[input[0]] = 1
@@ -140,15 +139,31 @@ def train_net():
             sln.readInput(input2)
             sln.feedForward()
             print("Expected value: " + str(input[0]) + " ----------------- Received Value: " + str(sln.getChosenValue()))
+            if input[0] == sln.getChosenValue():
+                numberCorrect += 1
             batchLoss += sln.getLoss(expectedOutput)
             if (count % 50 == 0):
                 batchLosses.append(batchLoss)
                 print ("Batch loss " + str(int(count / 50)) + ": " + str(batchLoss))
                 print("Batch losses " + str(batchLosses))
+                print("Learning rate: " + str(sln.learningRate))
                 batchLoss = 0
+                last_5_batches = batchLosses[-3:]
+                last_5_avg = sum(last_5_batches) / 3 if len(last_5_batches) == 3 else 100
+                if last_5_avg < 35:
+                    sln.learningRate = 1 if sln.learningRate > 1 else sln.learningRate
+                if last_5_avg < 30:
+                    sln.learningRate = .1 if sln.learningRate > .1 else sln.learningRate
+                if last_5_avg <  25:
+                    sln.learningRate = 0.01 if sln.learningRate > .01 else sln.learningRate
+                if last_5_avg < 23:
+                    sln.learningRate = 0.001 if sln.learningRate > .001 else sln.learningRate
+                if last_5_avg < 22:
+                    sln.learningRate = 0.0001 if sln.learningRate > .0001 else sln.learningRate
             sln.backProp(expectedOutput)
             print(count)
             count += 1
+            print ("Percent correct: " + str(100 * numberCorrect / count))
 
     with open('sln.pkl', 'wb') as output:
         pickle.dump(sln, output, pickle.HIGHEST_PROTOCOL)
