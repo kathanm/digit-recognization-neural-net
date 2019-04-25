@@ -44,7 +44,7 @@ class Net:
 
         # delta is dc/da * da/dz = dc/dz for last layer
         # because dz/db = 1 delta is also equal to dc/db
-        delta = (y - activations[-1]) * util.sigmoid_derivative(zs[-1])
+        delta = (activations[-1] - y) * util.sigmoid_derivative(zs[-1])
         deltaBiases[-1] = delta
         deltaWeights[-1] = np.matmul(delta, activations[-2].transpose())
 
@@ -55,48 +55,85 @@ class Net:
             deltaBiases[-layer] = delta
             deltaWeights[-layer] = np.matmul(delta, activations[-layer - 1].transpose())
 
-        return (deltaWeights, deltaBiases)
+        return (deltaWeights, deltaBiases, activations[-1])
+
+# x is actual output
+# y is expected outoput
+def get_loss(x, y):
+    diff = x - y
+    return np.sum(np.square(diff))
+
 
 def train_net():
     # Settings
-    layers = [784, 20, 10]
+    layers = [784, 20, 20, 10]
     learning_rate = 0.1
     mini_batch_size = 50
+    epochs = 3
 
     # Initialize neural net with layer sizes
     nn = Net(layers)
-    with open('../resources/train.csv', 'rb') as trainingData:
-        reader = csv.reader(trainingData)
-        deltaWeights = [np.zeros(w.shape) for w in nn.weights]
-        deltaBiases = [np.zeros(b.shape) for b in nn.biases]
-        count = 1
-        for row in reader:
-            # Setting up input and output
-            input = list(map(int, row))
-            expectedOutput = [0] * 10
-            expectedOutput[input[0]] = 1
-            expectedOutput = np.array(expectedOutput)
-            expectedOutput.shape = (10, 1)
-            input = np.array(input[1:])
-            input.shape = (784, 1)
+    for i in xrange(epochs):
+        with open('../resources/train.csv', 'rb') as trainingData:
+            print "STARTING EPOCH " + str(i)
+            reader = csv.reader(trainingData)
+            deltaWeights = [np.zeros(w.shape) for w in nn.weights]
+            deltaBiases = [np.zeros(b.shape) for b in nn.biases]
+            count = 1
+            batchLoss = 0
+            for row in reader:
+                # Setting up input and output
+                input = list(map(int, row))
+                expectedOutput = [0] * 10
+                expectedOutput[input[0]] = 1
+                expectedOutput = np.array(expectedOutput)
+                expectedOutput.shape = (10, 1)
+                input = np.array(input[1:])
+                input.shape = (784, 1)
 
-            dw, db = nn.backprop(input, expectedOutput)
-            deltaWeights = [tdw + dw for tdw, dw in zip(deltaWeights, dw)]
-            deltaBiases = [tdb + db for tdb, db in zip(deltaBiases, db)]
+                dw, db, output = nn.backprop(input, expectedOutput)
+                batchLoss += get_loss(output, expectedOutput)
+                deltaWeights = [tdw + dw for tdw, dw in zip(deltaWeights, dw)]
+                deltaBiases = [tdb + db for tdb, db in zip(deltaBiases, db)]
 
-            if count % mini_batch_size == 0:
-                deltaWeights = [dw / mini_batch_size for dw in deltaWeights]
-                deltaBiases = [db / mini_batch_size for db in deltaBiases]
-                nn.weights = [(w - dw * learning_rate) for w, dw in zip(nn.weights, deltaWeights)]
-                nn.biases = [(b - db * learning_rate) for b, db in zip(nn.biases, deltaBiases)]
+                if count % mini_batch_size == 0:
+                    deltaWeights = [dw / mini_batch_size for dw in deltaWeights]
+                    deltaBiases = [db / mini_batch_size for db in deltaBiases]
+                    nn.weights = [(w - (dw * learning_rate)) for w, dw in zip(nn.weights, deltaWeights)]
+                    nn.biases = [(b - (db * learning_rate)) for b, db in zip(nn.biases, deltaBiases)]
 
-                deltaWeights = [np.zeros(w.shape) for w in nn.weights]
-                deltaBiases = [np.zeros(b.shape) for b in nn.biases]
+                    deltaWeights = [np.zeros(w.shape) for w in nn.weights]
+                    deltaBiases = [np.zeros(b.shape) for b in nn.biases]
 
-            print count
-            count += 1
+                    print "Epoch " + str(i)
+                    print "Loss for batch " + str(count / mini_batch_size) + ": " + str(batchLoss)
+                    batchLoss = 0
 
-        with open('nn.pkl', 'wb') as output:
-            pickle.dump(nn, output, pickle.HIGHEST_PROTOCOL)
+                count += 1
 
-train_net()
+    with open('nn.pkl', 'wb') as output:
+        pickle.dump(nn, output, pickle.HIGHEST_PROTOCOL)
+
+def test_net():
+    with open('nn.pkl', 'rb') as input:
+        nn = pickle.load(input)
+        with open('../resources/submission.csv', 'wb') as f:
+            writer = csv.writer(f)
+            writer.writerow(['ImageId', 'Label'])
+            with open('../resources/test.csv', 'rb') as testfile:
+                reader = csv.reader(testfile, delimiter=',')
+                count = 0
+                for row in reader:
+                    print("Test: " + str(count))
+                    if count == 0:
+                        count += 1
+                        continue
+                    input = list(map(int, row))
+                    input = np.array(input)
+                    input.shape = (784, 1)
+                    output = nn.feedforward(input)
+                    result = np.argmax(output)
+                    writer.writerow([str(count), str(result)])
+                    count += 1
+
+test_net()
