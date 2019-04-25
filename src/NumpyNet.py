@@ -2,6 +2,8 @@
 
 import util
 import numpy as np
+import csv
+import pickle
 
 class Net:
     # LayerSizes is the list of all layer sizes. For example, a net with input size 100, one hidden layer with 20 nodes,
@@ -55,10 +57,46 @@ class Net:
 
         return (deltaWeights, deltaBiases)
 
+def train_net():
+    # Settings
+    layers = [784, 20, 10]
+    learning_rate = 0.1
+    mini_batch_size = 50
 
-n = Net([1, 2, 3])
-a = np.array([3])
-a.shape = (1,1)
-y = np.array([1, 0, 0])
-y.shape = (3, 1)
-n.backprop(a, y)
+    # Initialize neural net with layer sizes
+    nn = Net(layers)
+    with open('../resources/train.csv', 'rb') as trainingData:
+        reader = csv.reader(trainingData)
+        deltaWeights = [np.zeros(w.shape) for w in nn.weights]
+        deltaBiases = [np.zeros(b.shape) for b in nn.biases]
+        count = 1
+        for row in reader:
+            # Setting up input and output
+            input = list(map(int, row))
+            expectedOutput = [0] * 10
+            expectedOutput[input[0]] = 1
+            expectedOutput = np.array(expectedOutput)
+            expectedOutput.shape = (10, 1)
+            input = np.array(input[1:])
+            input.shape = (784, 1)
+
+            dw, db = nn.backprop(input, expectedOutput)
+            deltaWeights = [tdw + dw for tdw, dw in zip(deltaWeights, dw)]
+            deltaBiases = [tdb + db for tdb, db in zip(deltaBiases, db)]
+
+            if count % mini_batch_size == 0:
+                deltaWeights = [dw / mini_batch_size for dw in deltaWeights]
+                deltaBiases = [db / mini_batch_size for db in deltaBiases]
+                nn.weights = [(w - dw * learning_rate) for w, dw in zip(nn.weights, deltaWeights)]
+                nn.biases = [(b - db * learning_rate) for b, db in zip(nn.biases, deltaBiases)]
+
+                deltaWeights = [np.zeros(w.shape) for w in nn.weights]
+                deltaBiases = [np.zeros(b.shape) for b in nn.biases]
+
+            print count
+            count += 1
+
+        with open('nn.pkl', 'wb') as output:
+            pickle.dump(nn, output, pickle.HIGHEST_PROTOCOL)
+
+train_net()
