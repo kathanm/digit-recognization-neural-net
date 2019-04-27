@@ -68,8 +68,8 @@ def train_net():
     # Settings
     layers = [784, 20, 10]
     learning_rate = 0.1
-    mini_batch_size = 50
-    epochs = 10
+    mini_batch_size = 10
+    epochs = 15
 
     # Initialize neural net with layer sizes
     nn = Net(layers)
@@ -142,6 +142,7 @@ def test_net():
                         count += 1
                         continue
                     input = list(map(int, row))
+                    input = [x * (1.0 / 255.0) for x in input]
                     input = np.array(input)
                     input.shape = (784, 1)
                     output = nn.feedforward(input)
