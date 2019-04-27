@@ -66,13 +66,14 @@ def get_loss(x, y):
 
 def train_net():
     # Settings
-    layers = [784, 20, 20, 10]
-    learning_rate = 0.1
-    mini_batch_size = 50
-    epochs = 3
+    layers = [784, 20, 10]
+    learning_rate = 3
+    mini_batch_size = 10
+    epochs = 30
 
     # Initialize neural net with layer sizes
-    nn = Net(layers)
+    nn = Net([784, 30, 10])
+    accuracies = []
     for i in xrange(epochs):
         with open('../resources/train.csv', 'rb') as trainingData:
             print "STARTING EPOCH " + str(i)
@@ -80,6 +81,7 @@ def train_net():
             deltaWeights = [np.zeros(w.shape) for w in nn.weights]
             deltaBiases = [np.zeros(b.shape) for b in nn.biases]
             count = 1
+            numCorrect = 0
             batchLoss = 0
             for row in reader:
                 # Setting up input and output
@@ -92,6 +94,8 @@ def train_net():
                 input.shape = (784, 1)
 
                 dw, db, output = nn.backprop(input, expectedOutput)
+                if np.argmax(output) == np.argmax(expectedOutput):
+                    numCorrect += 1
                 batchLoss += get_loss(output, expectedOutput)
                 deltaWeights = [tdw + dw for tdw, dw in zip(deltaWeights, dw)]
                 deltaBiases = [tdb + db for tdb, db in zip(deltaBiases, db)]
@@ -110,6 +114,14 @@ def train_net():
                     batchLoss = 0
 
                 count += 1
+
+            percentCorrect = 100 * numCorrect / (count - 1)
+            accuracies.append(percentCorrect)
+            print "Epoch accuracy: " + str(percentCorrect)
+            print "Accuracies: " + str(accuracies)
+
+
+    print "Complete Accuracies: " + str(accuracies)
 
     with open('nn.pkl', 'wb') as output:
         pickle.dump(nn, output, pickle.HIGHEST_PROTOCOL)
@@ -136,4 +148,4 @@ def test_net():
                     writer.writerow([str(count), str(result)])
                     count += 1
 
-test_net()
+train_net()
