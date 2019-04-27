@@ -69,7 +69,7 @@ def train_net():
     layers = [784, 20, 10]
     learning_rate = 0.1
     mini_batch_size = 10
-    epochs = 15
+    epochs = 30
 
     # Initialize neural net with layer sizes
     nn = Net(layers)
@@ -150,4 +150,4 @@ def test_net():
                     writer.writerow([str(count), str(result)])
                     count += 1
 
-train_net()
+test_net()
