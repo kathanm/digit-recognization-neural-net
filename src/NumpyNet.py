@@ -67,12 +67,12 @@ def get_loss(x, y):
 def train_net():
     # Settings
     layers = [784, 20, 10]
-    learning_rate = 3
-    mini_batch_size = 10
-    epochs = 30
+    learning_rate = 0.1
+    mini_batch_size = 50
+    epochs = 10
 
     # Initialize neural net with layer sizes
-    nn = Net([784, 30, 10])
+    nn = Net(layers)
     accuracies = []
     for i in xrange(epochs):
         with open('../resources/train.csv', 'rb') as trainingData:
@@ -90,6 +90,7 @@ def train_net():
                 expectedOutput[input[0]] = 1
                 expectedOutput = np.array(expectedOutput)
                 expectedOutput.shape = (10, 1)
+                input = [x * (1.0 / 255.0) for x in input]
                 input = np.array(input[1:])
                 input.shape = (784, 1)
 
